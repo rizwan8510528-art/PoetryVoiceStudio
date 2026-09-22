@@ -1,4 +1,4 @@
-name: Build APK
+        name: Build APK
 
 on:
   workflow_dispatch:
@@ -13,27 +13,27 @@ jobs:
 
       - name: Extract project
         run: |
-          unzip -o *.zip -d project
-          find project -name settings.gradle -o -name settings.gradle.kts
+          rm -rf project
+          mkdir project
+          unzip -q PoetryVoiceStudio_Android_Project.zip -d project
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: Temurin
           java-version: '17'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.7'
 
       - name: Build APK
-        run: |
-          GRADLE_DIR=$(dirname "$(find project -name settings.gradle -o -name settings.gradle.kts | head -n 1)")
-          gradle -p "$GRADLE_DIR" assembleDebug
+        working-directory: project
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PoetryVoiceStudio-APK
-           path: project/**/app/build/outputs/apk/**/*.apk
+          path: project/app/build/outputs/apk/debug/*.apk
